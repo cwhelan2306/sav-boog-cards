@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✨ Sav Boog Cards ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pink-hot:   #ff4fa0;
+      --pink-mid:   #ff8cc8;
+      --pink-light: #ffd6eb;
+      --pink-pale:  #fff0f7;
+      --red:        #e8002a;
+      --white:      #ffffff;
+      --shadow:     0 8px 32px rgba(255, 79, 160, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #ffe0f0 0%, #ffd6eb 40%, #ffe8f5 100%);
+      min-height: 100vh;
+      color: #5a1a3a;
+    }
+
+    /* ─── Header ─── */
+    header {
+      text-align: center;
+      padding: 32px 16px 16px;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--pink-hot);
+      text-shadow: 2px 2px 0 #fff, 4px 4px 0 var(--pink-mid);
+      margin-top: 8px;
+    }
+    header p.tagline {
+      font-size: 1rem;
+      color: #c05090;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* ─── Kitty parade ─── */
+    .kitty-parade {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 22px auto 6px;
+      max-width: 680px;
+    }
+    .kitty-figure {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      animation: float 3s ease-in-out infinite;
+    }
+    .kitty-figure:nth-child(2) { animation-delay: 0.4s; }
+    .kitty-figure:nth-child(3) { animation-delay: 0.8s; }
+    .kitty-figure:nth-child(4) { animation-delay: 1.2s; }
+    .kitty-figure:nth-child(5) { animation-delay: 1.6s; }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+    .kitty-body {
+      position: relative;
+      width: 80px;
+      height: 90px;
+    }
+    /* dress / outfit */
+    .kitty-dress {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 56px; height: 42px;
+      border-radius: 8px 8px 18px 18px;
+    }
+    /* head */
+    .kitty-head {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 54px; height: 50px;
+      background: #fff;
+      border-radius: 50% 50% 45% 45%;
+      border: 2px solid #f0c0d8;
+      overflow: visible;
+    }
+    /* ears */
+    .kitty-head::before,
+    .kitty-head::after {
+      content: '';
+      position: absolute;
+      top: -14px;
+      width: 0; height: 0;
+      border-left:  12px solid transparent;
+      border-right: 12px solid transparent;
+    }
+    .kitty-head::before { left: 1px;  border-bottom: 18px solid #fff; }
+    .kitty-head::after  { right: 1px; border-bottom: 18px solid #fff; }
+    /* eyes */
+    .kitty-eyes {
+      position: absolute;
+      top: 18px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 10px;
+    }
+    .kitty-eye {
+      width: 7px; height: 7px;
+      background: #333;
+      border-radius: 50%;
+    }
+    /* nose */
+    .kitty-nose {
+      position: absolute;
+      top: 28px; left: 50%;
+      transform: translateX(-50%);
+      width: 5px; height: 4px;
+      background: #ffaacc;
+      border-radius: 50%;
+    }
+    /* whiskers */
+    .kitty-whiskers {
+      position: absolute;
+      top: 27px; left: 50%;
+      transform: translateX(-50%);
+      width: 44px;
+    }
+    .kitty-whiskers::before,
+    .kitty-whiskers::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      height: 1.5px;
+      width: 16px;
+      background: #d0a0b8;
+      border-radius: 2px;
+    }
+    .kitty-whiskers::before { left: 0; }
+    .kitty-whiskers::after  { right: 0; }
+    /* bow */
+    .kitty-bow {
+      position: absolute;
+      top: -2px; right: -6px;
+      font-size: 18px;
+      line-height: 1;
+    }
+    /* outfit label */
+    .kitty-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: #c05090;
+      letter-spacing: 0.5px;
+    }
+    /* accessories overlaid on head */
+    .kitty-accessory {
+      position: absolute;
+      top: -22px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* ─── Main layout ─── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px 20px 60px;
+    }
+
+    /* ─── Card shell (white rounded boxes) ─── */
+    .card-shell {
+      background: var(--white);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      border: 2px solid var(--pink-light);
+    }
+    .card-shell h2 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--pink-hot);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Buttons ─── */
+    button {
+      font-family: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      border: none;
+      border-radius: 14px;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    button:active { transform: scale(0.97); }
+
+    .btn-pink {
+      background: linear-gradient(135deg, var(--pink-hot), #ff85c0);
+      color: white;
+      padding: 12px 22px;
+      font-size: 0.95rem;
+      box-shadow: 0 4px 16px rgba(255,79,160,0.35);
+    }
+    .btn-pink:hover { background: linear-gradient(135deg, #e0007a, var(--pink-hot)); box-shadow: 0 6px 20px rgba(255,79,160,0.45); }
+    .btn-pink:disabled { opacity: 0.55; cursor: not-allowed; }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--pink-hot);
+      border: 2px solid var(--pink-hot);
+      padding: 11px 22px;
+      font-size: 0.95rem;
+    }
+    .btn-outline:hover { background: var(--pink-pale); }
+
+    /* ─── Notes textarea ─── */
+    textarea {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid var(--pink-light);
+      border-radius: 16px;
+      background: var(--pink-pale);
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: #5a1a3a;
+      resize: vertical;
+      min-height: 180px;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { outline: none; border-color: var(--pink-hot); }
+    textarea::placeholder { color: #d090b0; }
+
+    .generate-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .count-label {
+      font-size: 0.85rem;
+      color: #c05090;
+      font-weight: 700;
+    }
+    select {
+      padding: 11px 14px;
+      border: 2px solid var(--pink-light);
+      border-radius: 14px;
+      background: var(--pink-pale);
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: #5a1a3a;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    select:focus { outline: none; border-color: var(--pink-hot); }
+
+    /* ─── Loading spinner ─── */
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 32px;
+    }
+    .spinner {
+      width: 52px;
+      height: 52px;
+      border: 5px solid var(--pink-light);
+      border-top-color: var(--pink-hot);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { color: #c05090; font-weight: 700; font-size: 1rem; }
+
+    /* ─── Flashcard section ─── */
+    #flashcard-section { display: none; }
+
+    .progress-bar-wrap {
+      background: var(--pink-light);
+      border-radius: 99px;
+      height: 10px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--pink-hot), #ff85c0);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+    .card-counter {
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #c05090;
+      margin-bottom: 10px;
+    }
+
+    /* ─── Flip card ─── */
+    .flip-scene {
+      perspective: 1000px;
+      width: 100%;
+      margin: 0 auto 22px;
+    }
+    .flip-card {
+      position: relative;
+      width: 100%;
+      min-height: 220px;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(0.4,0,0.2,1);
+    }
+    .flip-card.flipped { transform: rotateY(180deg); }
+
+    .flip-card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      text-align: center;
+    }
+    .flip-card-front {
+      background: linear-gradient(135deg, #fff0f7, #ffe4f2);
+      border: 2px solid var(--pink-light);
+      box-shadow: var(--shadow);
+    }
+    .flip-card-back {
+      background: linear-gradient(135deg, #ffe4f2, #ffc8e4);
+      border: 2px solid var(--pink-mid);
+      box-shadow: var(--shadow);
+      transform: rotateY(180deg);
+    }
+    .face-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      opacity: 0.6;
+    }
+    .face-label.q { color: var(--pink-hot); }
+    .face-label.a { color: #b00060; }
+    .face-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.5;
+      color: #4a0a2a;
+    }
+    .flip-hint {
+      font-size: 0.78rem;
+      color: var(--pink-mid);
+      margin-top: 16px;
+      font-weight: 700;
+    }
+
+    /* ─── Card nav buttons ─── */
+    .nav-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .nav-row .card-index {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--pink-hot);
+      min-width: 80px;
+      text-align: center;
+    }
+
+    /* ─── Study-again / reset bar ─── */
+    .study-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    /* ─── Error toast ─── */
+    #error-box {
+      display: none;
+      background: #fff0f4;
+      border: 2px solid #ff6b9a;
+      border-radius: 16px;
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      color: #c0003a;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    /* ─── Confetti (CSS only) ─── */
+    .confetti-piece {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      animation: confetti-fall 2.5s ease forwards;
+      pointer-events: none;
+      z-index: 999;
+    }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh)  rotate(720deg); opacity: 0; }
+    }
+
+    /* ─── Paws decoration ─── */
+    .paws {
+      text-align: center;
+      font-size: 1.4rem;
+      letter-spacing: 8px;
+      opacity: 0.35;
+      margin: 10px 0 0;
+    }
+
+    @media (max-width: 500px) {
+      header h1 { font-size: 1.8rem; }
+      .card-shell { padding: 20px 18px; }
+      .flip-card-face { padding: 22px 18px; }
+      .face-text { font-size: 1.05rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <h1>Sav Boog Cards 🎀</h1>
+  <p class="tagline">Paste your notes → get cute flashcards ✨</p>
+
+  <!-- Hello Kitty parade in 5 outfits -->
+  <div class="kitty-parade">
+
+    <!-- 1. Classic red bow -->
+    <div class="kitty-figure">
+      <div class="kitty-body">
+        <div class="kitty-dress" style="background:linear-gradient(180deg,#ff4fa0,#ff85c0);"></div>
+        <div class="kitty-head">
+          <div class="kitty-bow">🎀</div>
+          <div class="kitty-eyes"><div class="kitty-eye"></div><div class="kitty-eye"></div></div>
+          <div class="kitty-nose"></div>
+          <div class="kitty-whiskers"></div>
+        </div>
+      </div>
+      <div class="kitty-label">Classic</div>
+    </div>
+
+    <!-- 2. Princess with crown -->
+    <div class="kitty-figure">
+      <div class="kitty-body">
+        <div class="kitty-dress" style="background:linear-gradient(180deg,#c97fe8,#e8b0ff);"></div>
+        <div class="kitty-head">
+          <div class="kitty-accessory">👑</div>
+          <div class="kitty-bow" style="color:#c97fe8;">🎀</div>
+          <div class="kitty-eyes"><div class="kitty-eye"></div><div class="kitty-eye"></div></div>
+          <div class="kitty-nose"></div>
+          <div class="kitty-whiskers"></div>
+        </div>
+      </div>
+      <div class="kitty-label">Princess</div>
+    </div>
+
+    <!-- 3. Beach / summer -->
+    <div class="kitty-figure">
+      <div class="kitty-body">
+        <div class="kitty-dress" style="background:linear-gradient(180deg,#ffcc00,#ffee88);"></div>
+        <div class="kitty-head">
+          <div class="kitty-accessory">🌸</div>
+          <div class="kitty-bow" style="color:#ffaa00;">🎀</div>
+          <div class="kitty-eyes"><div class="kitty-eye"></div><div class="kitty-eye"></div></div>
+          <div class="kitty-nose"></div>
+          <div class="kitty-whiskers"></div>
+        </div>
+      </div>
+      <div class="kitty-label">Sunshine</div>
+    </div>
+
+    <!-- 4. Space / astronaut -->
+    <div class="kitty-figure">
+      <div class="kitty-body">
+        <div class="kitty-dress" style="background:linear-gradient(180deg,#3a6fe8,#88b4ff);"></div>
+        <div class="kitty-head">
+          <div class="kitty-accessory">⭐</div>
+          <div class="kitty-bow" style="color:#3a6fe8;">🎀</div>
+          <div class="kitty-eyes"><div class="kitty-eye"></div><div class="kitty-eye"></div></div>
+          <div class="kitty-nose"></div>
+          <div class="kitty-whiskers"></div>
+        </div>
+      </div>
+      <div class="kitty-label">Stargazer</div>
+    </div>
+
+    <!-- 5. Strawberry -->
+    <div class="kitty-figure">
+      <div class="kitty-body">
+        <div class="kitty-dress" style="background:linear-gradient(180deg,#e83a3a,#ff8888);"></div>
+        <div class="kitty-head">
+          <div class="kitty-accessory">🍓</div>
+          <div class="kitty-bow" style="color:#e83a3a;">🎀</div>
+          <div class="kitty-eyes"><div class="kitty-eye"></div><div class="kitty-eye"></div></div>
+          <div class="kitty-nose"></div>
+          <div class="kitty-whiskers"></div>
+        </div>
+      </div>
+      <div class="kitty-label">Strawberry</div>
+    </div>
+
+  </div><!-- end parade -->
+  <div class="paws">🐾 🐾 🐾</div>
+</header>
+
+<main>
+
+  <!-- ─ Error box ─ -->
+  <div id="error-box"></div>
+
+  <!-- ─── Notes input ─── -->
+  <div class="card-shell">
+    <h2>📝 Your Notes</h2>
+    <textarea id="notes" placeholder="Paste your study notes here… anything goes! The more detail, the better your flashcards will be 🌸"></textarea>
+    <div class="generate-row">
+      <span class="count-label">How many cards?</span>
+      <select id="card-count">
+        <option value="5">5 cards</option>
+        <option value="10" selected>10 cards</option>
+        <option value="15">15 cards</option>
+        <option value="20">20 cards</option>
+      </select>
+      <button class="btn-pink" id="generate-btn" onclick="generateCards()">
+        ✨ Generate Flashcards
+      </button>
+    </div>
+  </div>
+
+  <!-- ─── Loading ─── -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Kitty is making your flashcards… 🎀</p>
+  </div>
+
+  <!-- ─── Flashcards ─── -->
+  <div class="card-shell" id="flashcard-section">
+    <h2>🃏 Your Flashcards</h2>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <p class="card-counter" id="card-counter"></p>
+
+    <div class="flip-scene">
+      <div class="flip-card" id="flip-card" onclick="flipCard()">
+        <div class="flip-card-face flip-card-front">
+          <div class="face-label q">Question</div>
+          <div class="face-text" id="question-text"></div>
+          <div class="flip-hint">👆 tap to flip</div>
+        </div>
+        <div class="flip-card-face flip-card-back">
+          <div class="face-label a">Answer</div>
+          <div class="face-text" id="answer-text"></div>
+          <div class="flip-hint">👆 tap to flip back</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-outline" onclick="prevCard()">← Prev</button>
+      <span class="card-index" id="card-index">1 / 10</span>
+      <button class="btn-outline" onclick="nextCard()">Next →</button>
+    </div>
+
+    <div class="study-actions">
+      <button class="btn-outline" onclick="shuffleCards()">🔀 Shuffle</button>
+      <button class="btn-pink"   onclick="restartStudy()">🔄 Start Over</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let cards       = [];   // [{question, answer}, ...]
+let currentIdx  = 0;
+let isFlipped   = false;
+
+// ═══════════════════════════════════════════════════════
+//  ON LOAD
+// ═══════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('keydown', handleKey);
+});
+
+function handleKey(e) {
+  if (!cards.length) return;
+  if (e.key === 'ArrowRight') nextCard();
+  if (e.key === 'ArrowLeft')  prevCard();
+  if (e.key === ' ')          { e.preventDefault(); flipCard(); }
+}
+
+// ═══════════════════════════════════════════════════════
+//  GENERATE FLASHCARDS
+// ═══════════════════════════════════════════════════════
+async function generateCards() {
+  clearError();
+
+  const notes = document.getElementById('notes').value.trim();
+  if (notes.length < 30) {
+    showError('Please paste some notes first! The more content, the better the cards 📝');
+    return;
+  }
+
+  const count = parseInt(document.getElementById('card-count').value);
+
+  setLoading(true);
+  document.getElementById('flashcard-section').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes, count }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+
+    cards = parseCards(data.text);
+
+    if (!cards.length) {
+      showError('Hmm, something went wrong parsing the response. Try again? 🌸');
+      setLoading(false);
+      return;
+    }
+
+    currentIdx = 0;
+    setLoading(false);
+    showCard();
+    document.getElementById('flashcard-section').style.display = 'block';
+    launchConfetti();
+
+  } catch (err) {
+    setLoading(false);
+    showError('Something went wrong: ' + err.message);
+  }
+}
+
+// ─── Parse JSON from Claude's response ───
+function parseCards(raw) {
+  // Try to extract a JSON array even if there's extra text
+  const match = raw.match(/\[[\s\S]*\]/);
+  if (!match) return [];
+  try {
+    const parsed = JSON.parse(match[0]);
+    return parsed.filter(c => c.question && c.answer);
+  } catch {
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  CARD DISPLAY
+// ═══════════════════════════════════════════════════════
+function showCard() {
+  const card = cards[currentIdx];
+  document.getElementById('question-text').textContent = card.question;
+  document.getElementById('answer-text').textContent   = card.answer;
+
+  // Reset flip
+  isFlipped = false;
+  document.getElementById('flip-card').classList.remove('flipped');
+
+  // Counter
+  document.getElementById('card-counter').textContent =
+    `Card ${currentIdx + 1} of ${cards.length}`;
+  document.getElementById('card-index').textContent =
+    `${currentIdx + 1} / ${cards.length}`;
+
+  // Progress bar
+  const pct = ((currentIdx + 1) / cards.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flip-card').classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  if (currentIdx < cards.length - 1) {
+    currentIdx++;
+    showCard();
+  }
+}
+
+function prevCard() {
+  if (currentIdx > 0) {
+    currentIdx--;
+    showCard();
+  }
+}
+
+function shuffleCards() {
+  // Fisher-Yates shuffle
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  currentIdx = 0;
+  showCard();
+  launchConfetti();
+}
+
+function restartStudy() {
+  currentIdx = 0;
+  showCard();
+}
+
+// ═══════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════
+function setLoading(on) {
+  document.getElementById('loading').style.display       = on ? 'block' : 'none';
+  document.getElementById('generate-btn').disabled       = on;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-box');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearError() {
+  document.getElementById('error-box').style.display = 'none';
+}
+
+// ─── Cute confetti burst ───
+function launchConfetti() {
+  const colors = ['#ff4fa0','#ff85c0','#ffb6d9','#ff0060','#ffffff','#ffd6eb'];
+  for (let i = 0; i < 40; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left            = Math.random() * 100 + 'vw';
+      el.style.top             = '-20px';
+      el.style.background      = colors[Math.floor(Math.random() * colors.length)];
+      el.style.width           = (8 + Math.random() * 12) + 'px';
+      el.style.height          = el.style.width;
+      el.style.animationDelay  = (Math.random() * 0.6) + 's';
+      el.style.animationDuration = (1.8 + Math.random()) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }, i * 30);
+  }
+}
+</script>
+</body>
+</html>
