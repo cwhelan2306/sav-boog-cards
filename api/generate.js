@@ -1,32 +1,5 @@
-import { kv } from '@vercel/kv';
-
-const DAILY_LIMIT = 10;
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-
-  // ── Rate limiting ──────────────────────────────────────
-  const ip =
-    (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
-    req.headers['x-real-ip'] ||
-    'unknown';
-
-  // Key resets automatically each calendar day (UTC)
-  const today = new Date().toISOString().slice(0, 10); // "2026-03-26"
-  const key   = `rl:${ip}:${today}`;
-
-  try {
-    const count = await kv.incr(key);
-    if (count === 1) await kv.expire(key, 86400);
-    if (count > DAILY_LIMIT) {
-      return res.status(429).json({
-        error: `Daily limit of ${DAILY_LIMIT} requests reached. Come back tomorrow! 🌸`,
-      });
-    }
-  } catch {
-    // KV unavailable — skip rate limiting and continue
-  }
-  // ──────────────────────────────────────────────────────
 
   const { notes, count: cardCount, image, imageType } = req.body;
   if (!cardCount) return res.status(400).json({ error: 'Missing count' });
@@ -86,7 +59,6 @@ OUTPUT FORMAT (JSON array only):
 
     const data = await response.json();
     if (!response.ok) {
-      // Return full error details for debugging
       const errMsg = data?.error?.message || JSON.stringify(data) || 'API error';
       return res.status(response.status).json({ error: `[${response.status}] ${errMsg}` });
     }

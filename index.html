@@ -882,10 +882,43 @@
     .gate-input::placeholder { letter-spacing: 0; font-weight: 600; color: #d090b0; }
     .gate-error { font-size: 0.85rem; color: #e0003a; font-weight: 700; margin-bottom: 12px; min-height: 20px; }
 
+    /* ─── HAMBURGER / MOBILE SIDEBAR ─── */
+    .hamburger-btn {
+      display: none;
+      position: fixed;
+      top: 12px; left: 12px;
+      z-index: 300;
+      background: var(--white);
+      border: 2px solid var(--pink-light);
+      border-radius: 10px;
+      padding: 7px 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      line-height: 1;
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      z-index: 200;
+    }
+    .sidebar-overlay.open { display: block; }
+    .sidebar.mobile-open {
+      display: flex !important;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 250;
+      box-shadow: var(--shadow-lg);
+    }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 900px) { .right-panel { display: none; } }
     @media (max-width: 680px) {
       .sidebar { display: none; }
+      .hamburger-btn { display: block; }
       .bottom-nav { display: block; }
       .main { padding: 16px 14px 80px; }
       .mcq-choices { grid-template-columns: 1fr; }
@@ -1319,11 +1352,16 @@
 <div id="deco-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;"></div>
 <div class="toast-container" id="toast-container"></div>
 
+<!-- Hamburger button (mobile only) -->
+<button class="hamburger-btn" id="hamburger-btn" onclick="openMobileSidebar()" aria-label="Open menu">☰</button>
+<!-- Overlay that closes the sidebar when tapped -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
 <!-- ═══ APP ═══ -->
 <div class="app">
 
   <!-- ── SIDEBAR ── -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
       <div class="sidebar-kitty">🎀</div>
       <h1>Sav Boog Cards</h1>
@@ -2151,15 +2189,12 @@ function getSets() {
 }
 function saveSets(sets) {
   localStorage.setItem('savBoogSets', JSON.stringify(sets));
-  // Auto-sync to cloud in background if a passphrase is saved
-  const phrase = localStorage.getItem('savBoogSyncPhrase') || 'inubu';
-  if (phrase.length >= 4) {
-    fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save', passphrase: phrase, data: sets }),
-    }).catch(() => {}); // silent — don't bother the user if it fails
-  }
+  // Auto-sync to cloud in background using fixed shared key
+  fetch('/api/sync', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'save', passphrase: 'inubu', data: sets }),
+  }).catch(() => {}); // silent — don't bother the user if it fails
 }
 function getSet(id) { return getSets().find(s => s.id === id) || null; }
 function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
@@ -2184,7 +2219,17 @@ function proficiencyPct(set) {
 // ═══════════════════════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════════════════════
+function openMobileSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+}
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+
 function navigate(view, setId = null) {
+  closeMobileSidebar();
   if (setId) currentSetId = setId;
 
   // Stop study timer if leaving study
@@ -2484,8 +2529,23 @@ function handlePhotoUpload(event) {
       document.getElementById('notes').value = '';
       document.getElementById('notes').placeholder = 'Using photo above — or clear it and type notes here 🌸';
     };
+    img.onerror = function() {
+      // Fallback: send raw base64 if canvas decode fails (e.g. HEIC on some browsers)
+      const dataUrl = e.target.result;
+      const comma = dataUrl.indexOf(',');
+      uploadedImage     = dataUrl.substring(comma + 1);
+      uploadedImageType = 'image/jpeg';
+      document.getElementById('photo-preview-img').src = dataUrl;
+      document.getElementById('photo-preview-name').textContent = file.name;
+      document.getElementById('photo-preview-wrap').classList.add('visible');
+      document.getElementById('upload-zone').classList.add('has-image');
+      document.getElementById('notes').value = '';
+      document.getElementById('notes').placeholder = 'Using photo above — or clear it and type notes here 🌸';
+    };
     img.src = e.target.result;
   };
+  // Reset input so same file can be re-selected
+  event.target.value = '';
   reader.readAsDataURL(file);
 }
 
@@ -5217,15 +5277,13 @@ setTimeout(initDailyLoginXP, 300);
 // Daily envelope (deferred so home renders first)
 setTimeout(initDailyEnvelope, 600);
 
-// Auto-load from cloud on startup if passphrase is saved
+// Auto-load from cloud on startup using fixed shared key
 (async () => {
-  const phrase = localStorage.getItem('savBoogSyncPhrase') || 'inubu';
-  if (phrase.length < 4) return;
   try {
     const res  = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'load', passphrase: phrase }),
+      body: JSON.stringify({ action: 'load', passphrase: 'inubu' }),
     });
     if (!res.ok) return;
     const json = await res.json();
