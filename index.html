@@ -1354,11 +1354,12 @@
 
 <!-- Hamburger button (mobile only) -->
 <button class="hamburger-btn" id="hamburger-btn" onclick="openMobileSidebar()" aria-label="Open menu">☰</button>
-<!-- Overlay that closes the sidebar when tapped -->
-<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
 <!-- ═══ APP ═══ -->
 <div class="app">
+
+  <!-- Overlay that closes the sidebar when tapped (inside app so z-index works correctly) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
 
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
