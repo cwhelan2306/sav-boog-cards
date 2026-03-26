@@ -15,16 +15,16 @@ export default async function handler(req, res) {
   const today = new Date().toISOString().slice(0, 10); // "2026-03-26"
   const key   = `rl:${ip}:${today}`;
 
-  const count = await kv.incr(key);
-  if (count === 1) {
-    // First request today — set TTL so the key cleans itself up after 24 h
-    await kv.expire(key, 86400);
-  }
-
-  if (count > DAILY_LIMIT) {
-    return res.status(429).json({
-      error: `Daily limit of ${DAILY_LIMIT} requests reached. Come back tomorrow! 🌸`,
-    });
+  try {
+    const count = await kv.incr(key);
+    if (count === 1) await kv.expire(key, 86400);
+    if (count > DAILY_LIMIT) {
+      return res.status(429).json({
+        error: `Daily limit of ${DAILY_LIMIT} requests reached. Come back tomorrow! 🌸`,
+      });
+    }
+  } catch {
+    // KV unavailable — skip rate limiting and continue
   }
   // ──────────────────────────────────────────────────────
 
@@ -86,7 +86,9 @@ OUTPUT FORMAT (JSON array only):
 
     const data = await response.json();
     if (!response.ok) {
-      return res.status(response.status).json({ error: data?.error?.message || 'API error' });
+      // Return full error details for debugging
+      const errMsg = data?.error?.message || JSON.stringify(data) || 'API error';
+      return res.status(response.status).json({ error: `[${response.status}] ${errMsg}` });
     }
 
     res.json({ text: data.content[0].text });
