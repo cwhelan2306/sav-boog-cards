@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  const { notes, count: cardCount, image, imageType } = req.body;
+  const { notes, count: cardCount, image, imageType, detail } = req.body;
   if (!cardCount) return res.status(400).json({ error: 'Missing count' });
   if (!notes && !image) return res.status(400).json({ error: 'Missing notes or image' });
 
@@ -10,12 +10,19 @@ export default async function handler(req, res) {
     ? 'Decide yourself how many flashcards to create — pick whatever number (between 5 and 40) best covers the most important concepts in the material. No more, no less.'
     : `Create exactly ${cardCount} flashcards`;
 
+  const detailInstruction =
+    detail === 'brief'
+      ? 'Answers must be extremely short — one phrase or one sentence maximum. No extra explanation.'
+      : detail === 'detailed'
+      ? 'Answers can be 2-3 sentences if needed to fully explain the concept.'
+      : 'Answers should be short and clear — 1 sentence max for simple facts, 2 sentences max for complex ones.';
+
   const prompt = `You are a helpful study assistant. Given the content below, ${countInstruction} to help a student study for their exam.
 
 RULES:
 - Each flashcard has one clear QUESTION and one concise ANSWER
 - Questions should test understanding, not just memorization
-- Answers should be short and clear (1-3 sentences max)
+- ${detailInstruction}
 - Cover the most important concepts
 - Output ONLY valid JSON — no markdown, no explanation, just the JSON array
 

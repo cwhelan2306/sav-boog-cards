@@ -35,7 +35,8 @@ export default async function handler(req, res) {
         contentType: 'application/json',
         addRandomSuffix: false,
       });
-      return res.json({ ok: true, sets: Array.isArray(data) ? data.length : '?' });
+      const setCount = Array.isArray(data) ? data.length : (Array.isArray(data?.sets) ? data.sets.length : '?');
+      return res.json({ ok: true, sets: setCount });
     } catch (err) {
       return res.status(500).json({ error: 'Save failed: ' + err.message });
     }

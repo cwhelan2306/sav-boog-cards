@@ -507,6 +507,18 @@
     .preview-card-content { flex: 1; }
     .preview-card-q { font-size: 0.88rem; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
     .preview-card-a { font-size: 0.82rem; font-weight: 600; color: var(--text-mid); }
+    .preview-card-input {
+      width: 100%; border: 1.5px solid var(--pink-light); border-radius: 8px;
+      padding: 5px 8px; font-family: inherit; font-size: 0.85rem; font-weight: 700;
+      background: var(--white); color: var(--text-dark); resize: none;
+      margin-bottom: 5px; min-height: 32px;
+    }
+    .preview-card-input:focus { outline: none; border-color: var(--pink-hot); }
+    .preview-card-delete {
+      background: none; border: none; cursor: pointer; font-size: 1rem;
+      color: var(--text-soft); padding: 2px 4px; flex-shrink: 0; margin-top: 2px;
+    }
+    .preview-card-delete:hover { color: #e0003a; }
 
     /* ─── LOADING ─── */
     #loading {
@@ -1483,6 +1495,11 @@
             <option value="50">50 cards</option>
             <option value="alfred">Alfred's Choice 🦇</option>
           </select>
+          <select id="card-detail">
+            <option value="brief">Brief ✂️</option>
+            <option value="standard" selected>Standard 📝</option>
+            <option value="detailed">Detailed 📖</option>
+          </select>
           <button class="btn-pink" id="generate-btn" onclick="generateCards()">✨ Generate</button>
         </div>
       </div>
@@ -2188,13 +2205,34 @@ function getSets() {
   }));
   return sets;
 }
+const _PROFILE_KEYS = [
+  'savBoogXP','savBoogLevel','savBoogStreak','savBoogLastStudy','savBoogStudyLog',
+  'savBoogEquippedKitty','savBoogOwnedKitties','savBoogActiveTheme','savBoogActiveBg',
+  'savBoogActiveDecos','savBoogUnlockedThemes','savBoogUnlockedBgs','savBoogUnlockedDecos',
+  'savBoogDark','savBoogStudyMode','savBoogDoubleXP','savBoogShields',
+  'savBoogDoubleXPDate','savBoogLastLogin','savBoogStreakLastShield',
+];
+function getProfile() {
+  const p = {};
+  _PROFILE_KEYS.forEach(k => { const v = localStorage.getItem(k); if (v !== null) p[k] = v; });
+  return p;
+}
+function restoreProfile(p) {
+  if (!p || typeof p !== 'object') return;
+  _PROFILE_KEYS.forEach(k => { if (p[k] !== undefined) localStorage.setItem(k, p[k]); });
+  // Re-apply dark mode and theme
+  if (p.savBoogDark === '1') document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+  if (p.savBoogActiveTheme) applyTheme(p.savBoogActiveTheme);
+}
+
 function saveSets(sets) {
   localStorage.setItem('savBoogSets', JSON.stringify(sets));
   // Auto-sync to cloud in background using fixed shared key
   fetch('/api/sync', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'save', passphrase: 'inubu', data: sets }),
+    body: JSON.stringify({ action: 'save', passphrase: 'inubu', data: { sets, profile: getProfile() } }),
   }).catch(() => {}); // silent — don't bother the user if it fails
 }
 function getSet(id) { return getSets().find(s => s.id === id) || null; }
@@ -2491,6 +2529,14 @@ function deleteSet(id) {
 // ═══════════════════════════════════════════════════════
 //  CREATE VIEW
 // ═══════════════════════════════════════════════════════
+function _resetPhotoInput() {
+  // Replace the file input with a fresh clone — fixes iOS bug where value='' doesn't reset
+  const old = document.getElementById('photo-input');
+  if (!old) return;
+  const fresh = old.cloneNode(true);
+  old.parentNode.replaceChild(fresh, old);
+}
+
 function initCreate() {
   pendingCards = [];
   dgmPendingDiagrams = [];
@@ -2500,7 +2546,7 @@ function initCreate() {
   document.getElementById('set-name-input').value = '';
   document.getElementById('photo-preview-wrap').classList.remove('visible');
   document.getElementById('upload-zone').classList.remove('has-image');
-  document.getElementById('photo-input').value = '';
+  _resetPhotoInput();
   document.getElementById('preview-section').style.display = 'none';
   document.getElementById('notes').placeholder = 'Paste your study notes here… the more detail the better! 🌸';
 }
@@ -2529,8 +2575,7 @@ function handlePhotoUpload(event) {
       document.getElementById('upload-zone').classList.add('has-image');
       document.getElementById('notes').value = '';
       document.getElementById('notes').placeholder = 'Using photo above — or clear it and type notes here 🌸';
-      // Reset input AFTER read so the file handle stays valid on mobile
-      event.target.value = '';
+      _resetPhotoInput();
     };
     img.onerror = function() {
       // Fallback: send raw base64 if canvas decode fails (e.g. HEIC on some browsers)
@@ -2544,7 +2589,7 @@ function handlePhotoUpload(event) {
       document.getElementById('upload-zone').classList.add('has-image');
       document.getElementById('notes').value = '';
       document.getElementById('notes').placeholder = 'Using photo above — or clear it and type notes here 🌸';
-      event.target.value = '';
+      _resetPhotoInput();
     };
     img.src = e.target.result;
   };
@@ -2553,7 +2598,7 @@ function handlePhotoUpload(event) {
 
 function clearPhoto() {
   uploadedImage = null; uploadedImageType = null;
-  document.getElementById('photo-input').value = '';
+  _resetPhotoInput();
   document.getElementById('photo-preview-wrap').classList.remove('visible');
   document.getElementById('upload-zone').classList.remove('has-image');
   document.getElementById('notes').placeholder = 'Paste your study notes here… the more detail the better! 🌸';
@@ -2564,6 +2609,7 @@ async function generateCards() {
   const notes = document.getElementById('notes').value.trim();
   const countVal = document.getElementById('card-count').value;
   const count = countVal === 'alfred' ? 'alfred' : parseInt(countVal);
+  const detail = document.getElementById('card-detail').value;
   if (!uploadedImage && notes.length < 30) {
     showError('Please paste some notes or upload a photo first! 📝');
     return;
@@ -2572,8 +2618,8 @@ async function generateCards() {
   document.getElementById('preview-section').style.display = 'none';
   try {
     const body = uploadedImage
-      ? { image: uploadedImage, imageType: uploadedImageType, count }
-      : { notes, count };
+      ? { image: uploadedImage, imageType: uploadedImageType, count, detail }
+      : { notes, count, detail };
     const res  = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
@@ -2595,7 +2641,14 @@ function renderPreview() {
     if (c.type === 'diagram') {
       return `<div class="preview-card"><div class="preview-card-num">${i + 1}</div><div class="preview-card-content"><div class="preview-card-q">🗺️ Diagram card — ${c.labels?.length || 0} label${(c.labels?.length || 0) !== 1 ? 's' : ''}</div></div></div>`;
     }
-    return `<div class="preview-card"><div class="preview-card-num">${i + 1}</div><div class="preview-card-content"><div class="preview-card-q">Q: ${esc(c.question)}</div><div class="preview-card-a">A: ${esc(c.answer)}</div></div></div>`;
+    return `<div class="preview-card">
+      <div class="preview-card-num">${i + 1}</div>
+      <div class="preview-card-content">
+        <textarea class="preview-card-input" rows="2" oninput="pendingCards[${i}].question=this.value">${esc(c.question)}</textarea>
+        <textarea class="preview-card-input" rows="2" oninput="pendingCards[${i}].answer=this.value">${esc(c.answer)}</textarea>
+      </div>
+      <button class="preview-card-delete" onclick="pendingCards.splice(${i},1);renderPreview()" title="Delete card">🗑️</button>
+    </div>`;
   }).join('');
 }
 
@@ -3805,7 +3858,7 @@ async function syncSave() {
     const res  = await fetch('/api/sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save', passphrase: phrase, data: sets }),
+      body: JSON.stringify({ action: 'save', passphrase: phrase, data: { sets, profile: getProfile() } }),
     });
     const json = await res.json();
     if (!res.ok) { _syncStatus(json.error || 'Save failed.', true); return; }
@@ -3828,10 +3881,12 @@ async function syncLoad() {
     });
     const json = await res.json();
     if (!res.ok) { _syncStatus(json.error || 'Load failed.', true); return; }
-    const incoming = json.data;
+    const payload = json.data;
+    const incoming = Array.isArray(payload) ? payload : payload?.sets;
     if (!Array.isArray(incoming)) { _syncStatus('Invalid data received.', true); return; }
     // Cloud always wins — ensures deletions propagate across devices
     saveSets(incoming);
+    if (!Array.isArray(payload) && payload?.profile) restoreProfile(payload.profile);
     _syncStatus(`✓ Loaded ${incoming.length} set${incoming.length !== 1 ? 's' : ''} — ${new Date().toLocaleTimeString()}`);
     renderLibrary();
   } catch (err) {
@@ -5286,10 +5341,13 @@ setTimeout(initDailyEnvelope, 600);
     });
     if (!res.ok) return;
     const json = await res.json();
-    const incoming = json.data;
+    const payload = json.data;
+    // Support both old format (array) and new format ({ sets, profile })
+    const incoming = Array.isArray(payload) ? payload : payload?.sets;
     if (!Array.isArray(incoming)) return;
     // Cloud always wins — this ensures deletions on one device propagate to others
     localStorage.setItem('savBoogSets', JSON.stringify(incoming));
+    if (!Array.isArray(payload) && payload?.profile) restoreProfile(payload.profile);
     // Re-render whichever view is showing so new data appears
     if (currentView === 'home')    renderHome();
     if (currentView === 'library') renderLibrary();
