@@ -2529,6 +2529,8 @@ function handlePhotoUpload(event) {
       document.getElementById('upload-zone').classList.add('has-image');
       document.getElementById('notes').value = '';
       document.getElementById('notes').placeholder = 'Using photo above — or clear it and type notes here 🌸';
+      // Reset input AFTER read so the file handle stays valid on mobile
+      event.target.value = '';
     };
     img.onerror = function() {
       // Fallback: send raw base64 if canvas decode fails (e.g. HEIC on some browsers)
@@ -2542,11 +2544,10 @@ function handlePhotoUpload(event) {
       document.getElementById('upload-zone').classList.add('has-image');
       document.getElementById('notes').value = '';
       document.getElementById('notes').placeholder = 'Using photo above — or clear it and type notes here 🌸';
+      event.target.value = '';
     };
     img.src = e.target.result;
   };
-  // Reset input so same file can be re-selected
-  event.target.value = '';
   reader.readAsDataURL(file);
 }
 
@@ -3829,11 +3830,8 @@ async function syncLoad() {
     if (!res.ok) { _syncStatus(json.error || 'Load failed.', true); return; }
     const incoming = json.data;
     if (!Array.isArray(incoming)) { _syncStatus('Invalid data received.', true); return; }
-    // Merge: incoming sets win; local-only sets are kept
-    const local = getSets();
-    const incomingIds = new Set(incoming.map(s => s.id));
-    const localOnly   = local.filter(s => !incomingIds.has(s.id));
-    saveSets([...incoming, ...localOnly]);
+    // Cloud always wins — ensures deletions propagate across devices
+    saveSets(incoming);
     _syncStatus(`✓ Loaded ${incoming.length} set${incoming.length !== 1 ? 's' : ''} — ${new Date().toLocaleTimeString()}`);
     renderLibrary();
   } catch (err) {
@@ -5290,10 +5288,8 @@ setTimeout(initDailyEnvelope, 600);
     const json = await res.json();
     const incoming = json.data;
     if (!Array.isArray(incoming)) return;
-    const local = getSets();
-    const incomingIds = new Set(incoming.map(s => s.id));
-    const localOnly   = local.filter(s => !incomingIds.has(s.id));
-    localStorage.setItem('savBoogSets', JSON.stringify([...incoming, ...localOnly]));
+    // Cloud always wins — this ensures deletions on one device propagate to others
+    localStorage.setItem('savBoogSets', JSON.stringify(incoming));
     // Re-render whichever view is showing so new data appears
     if (currentView === 'home')    renderHome();
     if (currentView === 'library') renderLibrary();
