@@ -20,10 +20,12 @@ export default async function handler(req, res) {
   const prompt = `You are a helpful study assistant. Given the content below, ${countInstruction} to help a student study for their exam.
 
 RULES:
+- ONLY use information from the notes provided — do NOT use outside knowledge or make up content not in the notes
+- Every question and answer must come directly from the provided notes
 - Each flashcard has one clear QUESTION and one concise ANSWER
 - Questions should test understanding, not just memorization
 - ${detailInstruction}
-- Cover the most important concepts
+- Cover the most important concepts from the notes
 - Output ONLY valid JSON — no markdown, no explanation, just the JSON array
 
 OUTPUT FORMAT (JSON array only):
